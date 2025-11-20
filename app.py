@@ -18,8 +18,15 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 hours
 CORS(app, supports_credentials=True)
 
-# Auth manager for OAuth flow
-auth_manager = AuthManager()
+# Auth manager for OAuth flow (lazy initialization)
+auth_manager = None
+
+def get_auth_manager():
+    """Get or create auth manager instance."""
+    global auth_manager
+    if auth_manager is None:
+        auth_manager = AuthManager()
+    return auth_manager
 
 # Per-user orchestrators (stored in session)
 orchestrators = {}
@@ -155,7 +162,8 @@ def index():
 def login():
     """Initiate OAuth login flow."""
     try:
-        authorization_url, state = auth_manager.get_authorization_url()
+        auth_mgr = get_auth_manager()
+        authorization_url, state = auth_mgr.get_authorization_url()
         session['oauth_state'] = state
         print(f"Redirecting to: {authorization_url}")
         return redirect(authorization_url)
@@ -300,7 +308,8 @@ def oauth_callback():
         # Exchange code for credentials
         print(f"Exchanging authorization code for credentials...")
         try:
-            credentials = auth_manager.get_credentials_from_code(code)
+            auth_mgr = get_auth_manager()
+            credentials = auth_mgr.get_credentials_from_code(code)
             print(f"✓ Credentials obtained successfully")
         except Exception as e:
             print(f"✗ ERROR exchanging code for credentials: {e}")

@@ -20,10 +20,36 @@ class AuthManager:
         # Note: Both localhost and 127.0.0.1 work, but must match Google Cloud Console exactly
         self.redirect_uri = os.getenv('OAUTH_REDIRECT_URI', 'http://127.0.0.1:5000/auth/callback')
         
-        # Load client config from credentials file
+        # Load client config from credentials file or environment variable
         import json
-        with open(self.client_secrets_file, 'r') as f:
-            client_config = json.load(f)
+        import base64
+        
+        # Try to load from environment variable first (for Railway deployment)
+        credentials_base64 = os.getenv('GOOGLE_CREDENTIALS_BASE64')
+        if credentials_base64:
+            # Decode from base64
+            try:
+                credentials_json = base64.b64decode(credentials_base64).decode('utf-8')
+                client_config = json.loads(credentials_json)
+                print("✓ Loaded credentials from GOOGLE_CREDENTIALS_BASE64 environment variable")
+            except Exception as e:
+                print(f"Error decoding GOOGLE_CREDENTIALS_BASE64: {e}")
+                print("Falling back to credentials.json file...")
+                # Fall back to file
+                try:
+                    with open(self.client_secrets_file, 'r') as f:
+                        client_config = json.load(f)
+                    print(f"✓ Loaded credentials from {self.client_secrets_file}")
+                except FileNotFoundError:
+                    raise ValueError(f"Could not load credentials: GOOGLE_CREDENTIALS_BASE64 decode failed and {self.client_secrets_file} not found")
+        else:
+            # Load from file (for local development)
+            try:
+                with open(self.client_secrets_file, 'r') as f:
+                    client_config = json.load(f)
+                print(f"✓ Loaded credentials from {self.client_secrets_file}")
+            except FileNotFoundError:
+                raise ValueError(f"Could not load credentials: GOOGLE_CREDENTIALS_BASE64 not set and {self.client_secrets_file} not found. Please set GOOGLE_CREDENTIALS_BASE64 environment variable or provide credentials.json file.")
         
         # Extract web app credentials
         if 'web' in client_config:
