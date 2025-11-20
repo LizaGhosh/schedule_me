@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calendar Assistant</h1>
+            <p class="subtitle">Your intelligent scheduling companion</p>
+            <div class="auth-status" id="authStatus">
+                <span id="authIndicator">Checking authentication...</span>
+                <a href="/logout" id="logoutLink" style="display: none; margin-left: 1rem; color: var(--secondary);">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-layout">
+            <div class="left-panel">
+                <div class="input-section">
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            id="queryInput" 
+                            placeholder="Ask me anything about your calendar..."
+                            autocomplete="off"
+                        >
+                        <button id="voiceBtn" class="voice-btn" title="Voice input">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M12 1v8m0 0v8m0-8h8m-8 0H4m8 8v8m0-8h8m-8 0H4"/>
+                            </svg>
+                        </button>
+                    <button id="sendBtn" class="send-btn">Send</button>
+                    <button id="testTTSBtn" class="test-tts-btn" title="Test TTS">🔊</button>
+                </div>
+            </div>
+
+                <div class="response-section">
+                    <div id="responseArea" class="response-area">
+                        <div class="welcome-message">
+                            <p>👋 Hi! I'm your calendar assistant.</p>
+                            <p>Try asking:</p>
+                            <ul>
+                                <li>"What events do I have today?"</li>
+                                <li>"Schedule a meeting tomorrow at 3pm"</li>
+                                <li>"Show me events for this week"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="events-section">
+                    <h2>Your Events</h2>
+                    <div id="eventsList" class="events-list">
+                        <div class="loading">Loading events...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <button id="prevMonth" class="calendar-nav">←</button>
+                        <h2 id="calendarMonth"></h2>
+                        <button id="nextMonth" class="calendar-nav">→</button>
+                    </div>
+                    <div id="calendarGrid" class="calendar-grid"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+
